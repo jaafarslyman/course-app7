@@ -5,7 +5,7 @@ I will provide all the required features to keep them in mind, save them as .txt
 Pre uploaded course.
 One course, inside it different levels and sections, inside each level or section there will be the content, it's either long videos (15~30 minutes), images, or voice notes.
 
-Crucial: the app shouldn't allow screenshots, screen recordings, downloading the content.
+Security goal: deter copying and block downloads where the platform allows it. The browser version cannot reliably stop operating-system screenshots or screen recordings. The Android APK must enable native `FLAG_SECURE` on learner screens; this blocks standard system capture but cannot prevent external-camera recording or capture on a compromised device.
 
 The app should display for the user his progress in each course, level and section, even how much he viewed from each video, just like YouTube.
 

@@ -114,23 +114,6 @@ export function LearnerContentViewerPage() {
   const [mediaError, setMediaError] = useState('');
   const [savingError, setSavingError] = useState('');
 
-  useEffect(() => {
-    const blockContextMenu = (event: MouseEvent) => event.preventDefault();
-    const blockCopyShortcuts = (event: KeyboardEvent) => {
-      if (!(event.ctrlKey || event.metaKey)) return;
-      if (['c', 'p', 's', 'u'].includes(event.key.toLowerCase())) {
-        event.preventDefault();
-      }
-    };
-
-    document.addEventListener('contextmenu', blockContextMenu);
-    window.addEventListener('keydown', blockCopyShortcuts);
-    return () => {
-      document.removeEventListener('contextmenu', blockContextMenu);
-      window.removeEventListener('keydown', blockCopyShortcuts);
-    };
-  }, []);
-
   const courses = useMemo(() => [...(query.data ?? [])].sort((a, b) => a.sortOrder - b.sortOrder), [query.data]);
   const course = courseId ? courses.find((entry) => entry.id === courseId) : courses[0];
   const flatItems = useMemo(() => course ? flattenCourse(course) : [], [course]);

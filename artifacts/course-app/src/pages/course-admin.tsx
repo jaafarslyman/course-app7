@@ -36,6 +36,7 @@ import {
   Upload,
   Video,
   X,
+  type LucideIcon,
 } from 'lucide-react';
 import { Link, useParams } from 'wouter';
 import {
@@ -363,7 +364,12 @@ export function CourseBuilderPage() {
           <div className="course-breadcrumbs"><Link href="/admin/courses">الدورات</Link><ChevronLeft size={14} /><span>{course?.name ?? 'بناء الدورة'}</span></div>
           <div className="course-heading-tools">
             {course && <span className={`course-status ${course.published ? '' : 'draft'}`}>{course.published ? 'منشورة للمتعلمين' : 'مسودة'}</span>}
-            {course && <button className="button-soft" type="button" onClick={() => void run('set_course_published', { courseId, published: !course.published })}>{course.published ? 'إيقاف النشر' : 'نشر الدورة'}</button>}
+            {course && <EditorIconButton
+              icon={course.published ? Radio : Check}
+              label={course.published ? 'إيقاف نشر الدورة' : 'نشر الدورة'}
+              onClick={() => void run('set_course_published', { courseId, published: !course.published })}
+              tone={course.published ? 'primary' : 'default'}
+            />}
           </div>
         </div>
         {query.isLoading ? <LoadingState label="جارٍ تحميل بنية الدورة…" /> :
@@ -372,10 +378,24 @@ export function CourseBuilderPage() {
           <>
             <section className="course-builder-hero">
               <div><div className="eyebrow">مخطط المحتوى</div><h2>{course.name}</h2><p>رتّب المواد في المستوى أو القسم المناسب. سيظهر هذا الترتيب نفسه للمتعلّم.</p></div>
-              <div className="course-builder-hero-tools">
-                <button className="button-soft" type="button" onClick={() => setEditingName({ type: 'course', id: course.id, title: course.name })}><Pencil size={15} /> تعديل الاسم</button>
-                {levels.length === 0 && <button className="button-primary" type="button" onClick={() => setDialog({ type: 'content', scope: { levelId: null, sectionId: null } })}><Plus size={16} /> مادة للدورة</button>}
-                {course.items.length === 0 && <button className="button-primary" type="button" onClick={() => setDialog({ type: 'level', scope: { levelId: null, sectionId: null } })}><Plus size={16} /> إضافة مستوى</button>}
+              <div className="course-builder-hero-tools" role="group" aria-label="أدوات الدورة">
+                <EditorIconButton
+                  icon={Pencil}
+                  label="تعديل اسم الدورة"
+                  onClick={() => setEditingName({ type: 'course', id: course.id, title: course.name })}
+                />
+                {levels.length === 0 && <EditorIconButton
+                  icon={Plus}
+                  label="إضافة مادة للدورة"
+                  onClick={() => setDialog({ type: 'content', scope: { levelId: null, sectionId: null } })}
+                  tone="primary"
+                />}
+                {course.items.length === 0 && <EditorIconButton
+                  icon={Layers3}
+                  label="إضافة مستوى"
+                  onClick={() => setDialog({ type: 'level', scope: { levelId: null, sectionId: null } })}
+                  tone="primary"
+                />}
               </div>
             </section>
             {error && <InlineAlert>{error}</InlineAlert>}
@@ -396,10 +416,28 @@ export function CourseBuilderPage() {
                   <div className="course-scope-head">
                     <div className="course-scope-heading"><DragHandle attributes={attributes} listeners={listeners} /><span className="course-scope-number">{formatCount(level.sortOrder + 1).padStart(2, '0')}</span><div><h3>{level.title}</h3><p>{formatCount(level.items.length + level.sections.reduce((n, section) => n + section.items.length, 0))} مادة تعليمية · {formatCount(level.sections.length)} أقسام</p></div></div>
                     <div className="course-scope-tools">
-                       {level.sections.length === 0 && <button className="button-soft" type="button" onClick={() => setDialog({ type: 'content', scope: { levelId: level.id, sectionId: null } })}><Plus size={14} /> مادة للمستوى</button>}
-                       {level.items.length === 0 && <button className="button-soft" type="button" onClick={() => setDialog({ type: 'section', scope: { levelId: level.id, sectionId: null } })}><Plus size={14} /> قسم</button>}
-                      <button className="course-tool" type="button" aria-label="تعديل المستوى" onClick={() => setEditingName({ type: 'level', id: level.id, title: level.title })}><Pencil size={14} /></button>
-                       <button className="course-tool" type="button" aria-label="حذف المستوى" onClick={() => confirmDelete(level.title, 'delete_level', { levelId: level.id }, levelMediaPaths(level))}><Trash2 size={14} /></button>
+                       {level.sections.length === 0 && <EditorIconButton
+                         icon={Plus}
+                         label={`إضافة مادة إلى ${level.title}`}
+                         onClick={() => setDialog({ type: 'content', scope: { levelId: level.id, sectionId: null } })}
+                         tone="primary"
+                       />}
+                        {level.items.length === 0 && <EditorIconButton
+                          icon={Layers3}
+                          label={`إضافة قسم إلى ${level.title}`}
+                          onClick={() => setDialog({ type: 'section', scope: { levelId: level.id, sectionId: null } })}
+                        />}
+                       <EditorIconButton
+                         icon={Pencil}
+                         label={`تعديل ${level.title}`}
+                         onClick={() => setEditingName({ type: 'level', id: level.id, title: level.title })}
+                       />
+                        <EditorIconButton
+                          icon={Trash2}
+                          label={`حذف ${level.title}`}
+                          onClick={() => confirmDelete(level.title, 'delete_level', { levelId: level.id }, levelMediaPaths(level))}
+                          tone="danger"
+                        />
                     </div>
                   </div>
                     {level.sections.length === 0 && <ContentList items={[...level.items].sort((a, b) => a.sortOrder - b.sortOrder)} onReorder={(ids) => void reorderGroup('content', 'level', level.id, ids)} onEdit={(item) => setDialog({ type: 'content', scope: { levelId: level.id, sectionId: null }, item })} onDelete={(item) => confirmDelete(item.title, 'delete_content', { contentId: item.id }, contentMediaPaths(item))} />}
@@ -466,8 +504,44 @@ function ContentList({
   if (!items.length) return <div className="scope-empty">لا توجد مواد في هذا المكان بعد.</div>;
   return <SortableList items={items} label="ترتيب المواد التعليمية" onReorder={(next) => onReorder(next.map((item) => item.id))} render={(item) => ({ attributes, listeners }) => {
     const Icon = kindIcons[item.kind];
-    return <div className="course-content-row"><span className={`content-kind-icon ${item.kind}`}><Icon size={18} /></span><div className="course-content-copy"><div className="course-content-title">{item.title}</div><div className="course-content-subtitle">{kindNames[item.kind]}</div>{item.supplementalNote?.trim() && <p className="course-content-note-preview">{item.supplementalNote}</p>}</div><div className="course-content-actions"><button className="course-tool" type="button" aria-label={`تعديل ${item.title}`} onClick={() => onEdit(item)}><Pencil size={14} /></button><button className="course-tool" type="button" aria-label={`حذف ${item.title}`} onClick={() => onDelete(item)}><Trash2 size={14} /></button><DragHandle attributes={attributes} listeners={listeners} /></div></div>;
+    return <div className="course-content-row">
+      <span className={`content-kind-icon ${item.kind}`}><Icon size={18} /></span>
+      <div className="course-content-copy">
+        <div className="course-content-title">{item.title}</div>
+        <div className="course-content-subtitle">{kindNames[item.kind]}</div>
+        {item.supplementalNote?.trim() && <p className="course-content-note-preview">{item.supplementalNote}</p>}
+      </div>
+      <div className="course-content-actions" role="group" aria-label={`أدوات ${item.title}`}>
+        <EditorIconButton icon={Pencil} label={`تعديل ${item.title}`} onClick={() => onEdit(item)} />
+        <EditorIconButton icon={Trash2} label={`حذف ${item.title}`} onClick={() => onDelete(item)} tone="danger" />
+        <DragHandle attributes={attributes} listeners={listeners} />
+      </div>
+    </div>;
   }} />;
+}
+
+function EditorIconButton({
+  icon: Icon,
+  label,
+  onClick,
+  tone = 'default',
+}: {
+  icon: LucideIcon;
+  label: string;
+  onClick: () => void;
+  tone?: 'default' | 'primary' | 'danger';
+}) {
+  return (
+    <button
+      className={`course-tool course-icon-action${tone === 'default' ? '' : ` ${tone}`}`}
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+    >
+      <Icon size={16} aria-hidden="true" />
+    </button>
+  );
 }
 
 function SectionBlock({
@@ -486,7 +560,11 @@ function SectionBlock({
   return <div className="course-section">
     <div className="course-scope-head">
       <div className="course-scope-heading"><DragHandle attributes={attributes} listeners={listeners} /><span className="course-scope-number"><Layers3 size={16} /></span><div><h3>{section.title}</h3><p>{formatCount(section.items.length)} مواد</p></div></div>
-      <div className="course-scope-tools"><button className="button-soft" type="button" onClick={onAdd}><Plus size={13} /> مادة</button><button className="course-tool" type="button" aria-label="تعديل القسم" onClick={onRename}><Pencil size={14} /></button><button className="course-tool" type="button" aria-label="حذف القسم" onClick={onDelete}><Trash2 size={14} /></button></div>
+      <div className="course-scope-tools" role="group" aria-label={`أدوات ${section.title}`}>
+        <EditorIconButton icon={Plus} label={`إضافة مادة إلى ${section.title}`} onClick={onAdd} tone="primary" />
+        <EditorIconButton icon={Pencil} label={`تعديل ${section.title}`} onClick={onRename} />
+        <EditorIconButton icon={Trash2} label={`حذف ${section.title}`} onClick={onDelete} tone="danger" />
+      </div>
     </div>
     <ContentList items={[...section.items].sort((a, b) => a.sortOrder - b.sortOrder)} onReorder={onItemsReorder} onEdit={onItemEdit} onDelete={onItemDelete} />
   </div>;

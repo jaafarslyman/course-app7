@@ -483,6 +483,31 @@
   }
 }
 
+.learner-capture-deterrents .main-area .content-wrap {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.learner-capture-deterrents input,
+.learner-capture-deterrents textarea,
+.learner-capture-deterrents select,
+.learner-capture-deterrents [contenteditable='true'] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.learner-capture-deterrents img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+@media print {
+  .learner-capture-deterrents {
+    display: none !important;
+  }
+}
+
 /* Lughati — pocket-first editorial learning interface */
 :root {
   color-scheme: light;

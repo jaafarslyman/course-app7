@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import {
   BookOpen,
   KeyRound,
@@ -39,6 +39,51 @@ export function AppShell({
   fullScreen = false,
 }: AppShellProps) {
   const [location, setLocation] = useLocation();
+  useEffect(() => {
+    if (audience !== 'learner') return;
+
+    const blockBrowserCaptureAction = (event: Event) => {
+      event.preventDefault();
+    };
+    const blockCaptureShortcuts = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      const command = event.ctrlKey || event.metaKey;
+      const printScreen = key === 'printscreen';
+      const browserShortcut = command && ['c', 'p', 's', 'u'].includes(key);
+      const macScreenshotShortcut =
+        event.metaKey && event.shiftKey && ['3', '4', '5'].includes(key);
+
+      if (printScreen || browserShortcut || macScreenshotShortcut) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+    const pauseHiddenMedia = () => {
+      if (document.visibilityState !== 'hidden') return;
+      document
+        .querySelectorAll<HTMLVideoElement | HTMLAudioElement>(
+          '.learner-capture-deterrents video, .learner-capture-deterrents audio',
+        )
+        .forEach((media) => media.pause());
+    };
+
+    document.addEventListener('contextmenu', blockBrowserCaptureAction, true);
+    document.addEventListener('copy', blockBrowserCaptureAction, true);
+    document.addEventListener('cut', blockBrowserCaptureAction, true);
+    document.addEventListener('dragstart', blockBrowserCaptureAction, true);
+    document.addEventListener('keydown', blockCaptureShortcuts, true);
+    document.addEventListener('visibilitychange', pauseHiddenMedia);
+
+    return () => {
+      document.removeEventListener('contextmenu', blockBrowserCaptureAction, true);
+      document.removeEventListener('copy', blockBrowserCaptureAction, true);
+      document.removeEventListener('cut', blockBrowserCaptureAction, true);
+      document.removeEventListener('dragstart', blockBrowserCaptureAction, true);
+      document.removeEventListener('keydown', blockCaptureShortcuts, true);
+      document.removeEventListener('visibilitychange', pauseHiddenMedia);
+    };
+  }, [audience]);
+
   const navigation =
     audience === 'learner' ? learnerNavigation : adminNavigation;
   const isActive = (href: string) =>
@@ -55,7 +100,7 @@ export function AppShell({
       : undefined;
 
   return (
-    <div className={`app-shell admin-layout${fullScreen ? ' full-screen-shell' : ''}`}>
+    <div className={`app-shell admin-layout${fullScreen ? ' full-screen-shell' : ''}${audience === 'learner' ? ' learner-capture-deterrents' : ''}`}>
       <aside className="sidebar">
         <AppLogo />
         <nav className="nav-list" aria-label="التنقّل الرئيسي">
