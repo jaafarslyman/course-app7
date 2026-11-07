@@ -130,11 +130,13 @@ function SortableList<T extends { id: string }>({
   onReorder,
   render,
   label,
+  className,
 }: {
   items: T[];
   onReorder: (items: T[]) => void;
   render: (item: T) => (props: { attributes: DraggableAttributes; listeners: SortListeners }) => ReactNode;
   label: string;
+  className?: string;
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -151,7 +153,7 @@ function SortableList<T extends { id: string }>({
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
       <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-        <div aria-label={label}>{items.map((item) => <SortableItem key={item.id} id={item.id}>{render(item)}</SortableItem>)}</div>
+        <div aria-label={label} className={className}>{items.map((item) => <SortableItem key={item.id} id={item.id}>{render(item)}</SortableItem>)}</div>
       </SortableContext>
     </DndContext>
   );
@@ -258,22 +260,47 @@ export function AdminCoursesIndexPage() {
             items={courses}
             label="ترتيب الدورات"
             onReorder={(next) => void reorderCourses(next)}
+            className="course-list"
             render={(course) => ({ attributes, listeners }) => (
               <article className="panel course-list-card">
-                <div className="course-list-mark"><BookOpen size={23} aria-hidden="true" /></div>
-                <div className="course-list-copy">
-                  <h2>{course.name}</h2>
-                  <p>{formatCount(course.levels.length)} مستويات · {formatCount(countCourseItems(course))} مادة تعليمية</p>
+                <div className="course-list-main">
+                  <div className="course-list-mark"><BookOpen size={24} aria-hidden="true" /></div>
+                  <div className="course-list-copy">
+                    <div className="course-list-title-row">
+                      <h2>{course.name}</h2>
+                      <span className={`course-status${course.published ? '' : ' draft'}`}>
+                        {course.published ? <Check size={14} aria-hidden="true" /> : <Radio size={14} aria-hidden="true" />}
+                        {course.published ? 'منشورة' : 'مسودة'}
+                      </span>
+                    </div>
+                    <div className="course-card-stats" role="group" aria-label="ملخص الدورة">
+                      <span><Layers3 size={15} aria-hidden="true" /> {formatCount(course.levels.length)} مستويات</span>
+                      <span><FileText size={15} aria-hidden="true" /> {formatCount(countCourseItems(course))} مادة تعليمية</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="course-list-tools">
-                  <span className={`course-status ${course.published ? '' : 'draft'}`}>{course.published ? 'منشورة' : 'مسودة'}</span>
-                  <Link className="button-primary compact-action" href={`/admin/courses/${encodeURIComponent(course.id)}`}>فتح البناء <ChevronLeft size={15} aria-hidden="true" /></Link>
-                  <button className="course-tool" type="button" onClick={() => void run('set_course_published', { courseId: course.id, published: !course.published })} aria-label={course.published ? 'إلغاء النشر' : 'نشر الدورة'}>
-                    {course.published ? <Check size={16} /> : <Radio size={16} />}
-                  </button>
-                  <button className="course-tool" type="button" onClick={() => { setName(course.name); setEditing(course); }} aria-label="تعديل اسم الدورة"><Pencil size={15} /></button>
-                  <button className="course-tool" type="button" onClick={() => deleteCourse(course)} aria-label="حذف الدورة"><Trash2 size={15} /></button>
-                  <DragHandle attributes={attributes} listeners={listeners} />
+                <div className="course-list-footer">
+                  <Link className="button-primary compact-action course-open-action" href={`/admin/courses/${encodeURIComponent(course.id)}`}>
+                    فتح البناء <ChevronLeft size={16} aria-hidden="true" />
+                  </Link>
+                  <div className="course-list-tools course-card-actions" role="group" aria-label={`إجراءات ${course.name}`}>
+                    <button
+                      className={`course-tool${course.published ? ' publish-action' : ''}`}
+                      type="button"
+                      onClick={() => void run('set_course_published', { courseId: course.id, published: !course.published })}
+                      aria-label={course.published ? 'إيقاف النشر' : 'نشر الدورة'}
+                      title={course.published ? 'إيقاف النشر' : 'نشر الدورة'}
+                    >
+                      {course.published ? <Radio size={17} aria-hidden="true" /> : <Check size={17} aria-hidden="true" />}
+                    </button>
+                    <button className="course-tool" type="button" onClick={() => { setName(course.name); setEditing(course); }} aria-label="تعديل اسم الدورة" title="تعديل اسم الدورة">
+                      <Pencil size={16} aria-hidden="true" />
+                    </button>
+                    <button className="course-tool delete-action" type="button" onClick={() => deleteCourse(course)} aria-label="حذف الدورة" title="حذف الدورة">
+                      <Trash2 size={16} aria-hidden="true" />
+                    </button>
+                    <DragHandle attributes={attributes} listeners={listeners} />
+                  </div>
                 </div>
               </article>
             )}

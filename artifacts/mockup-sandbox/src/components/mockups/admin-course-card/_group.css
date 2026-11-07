@@ -1,0 +1,211 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap");
+
+:root {
+  --background: 40 42% 95%;
+  --foreground: 202 27% 21%;
+  --border: 34 24% 84%;
+  --card: 42 48% 99%;
+  --card-foreground: 202 27% 21%;
+  --primary: 174 43% 31%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 38 27% 90%;
+  --muted-foreground: 198 11% 46%;
+  --destructive: 4 59% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --app-font-sans: "IBM Plex Sans Arabic", "DM Sans", sans-serif;
+  --radius: 1.15rem;
+}
+
+.dark {
+  --background: 222 28% 13%;
+  --foreground: 42 67% 97%;
+  --border: 220 18% 26%;
+  --card: 222 25% 17%;
+  --card-foreground: 42 67% 97%;
+  --primary: 166 49% 45%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 220 20% 22%;
+  --muted-foreground: 220 14% 66%;
+  --destructive: 4 59% 51%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans Arabic", "DM Sans", sans-serif;
+}
+
+.course-pages {
+  --course-ink: #253b42;
+  --course-muted: #718184;
+  --course-line: #e4e9df;
+  --course-paper: #fffefa;
+  --course-ground: #f4f7ed;
+  --course-teal: #207d68;
+  min-height: 100vh;
+  padding: 28px;
+  background: var(--course-ground);
+  color: var(--course-ink);
+  font-family: "IBM Plex Sans Arabic", "DM Sans", sans-serif;
+}
+
+.course-pages button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.course-pages .panel {
+  border: 1px solid var(--course-line);
+  border-radius: 20px;
+  background: var(--course-paper);
+  box-shadow: 0 10px 32px rgba(48, 70, 55, .045);
+}
+
+.course-list-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 15px;
+  align-items: center;
+  padding: 19px 20px;
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.course-list-card:hover {
+  transform: translateY(-2px);
+  border-color: #b9d8c9;
+}
+
+.course-list-mark {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 19px 19px 19px 6px;
+  background: #e5f2ea;
+  color: var(--course-teal);
+}
+
+.course-list-copy {
+  min-width: 0;
+}
+
+.course-list-copy h2 {
+  margin: 0;
+  font-size: 1.03rem;
+  font-weight: 750;
+}
+
+.course-list-copy p {
+  margin: 5px 0 0;
+  color: var(--course-muted);
+  font-size: .82rem;
+}
+
+.course-list-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.course-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 99px;
+  background: #e7f3eb;
+  color: #28755d;
+  padding: 6px 10px;
+  font-size: .75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.course-status.draft {
+  background: #fff2d8;
+  color: #94641b;
+}
+
+.course-tool {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+  border: 1px solid var(--course-line);
+  border-radius: 12px;
+  background: #fffefa;
+  color: #667875;
+}
+
+.course-tool:hover {
+  background: #f1f5ed;
+  color: var(--course-teal);
+}
+
+.button-primary {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 14px;
+  background: #174f49;
+  box-shadow: 0 5px 13px rgba(23, 79, 73, .14);
+  color: white;
+  padding: 10px 16px;
+  font-size: .86rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.compact-action {
+  min-height: 40px;
+}
+
+@media (max-width: 680px) {
+  .course-pages {
+    padding: 18px;
+  }
+
+  .course-list-card {
+    grid-template-columns: 45px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .course-list-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 15px 15px 15px 5px;
+  }
+
+  .course-list-tools {
+    gap: 5px;
+  }
+
+  .course-list-tools .course-status {
+    display: none;
+  }
+
+  .course-list-tools .button-primary {
+    min-height: 40px;
+    padding: 0 10px;
+    font-size: .72rem;
+    white-space: nowrap;
+  }
+
+  .course-list-tools .course-tool {
+    width: 36px;
+    height: 36px;
+  }
+
+  .course-list-copy h2 {
+    font-size: .92rem;
+  }
+}
